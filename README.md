@@ -18,7 +18,7 @@ Docker Environment params:
 
 Comand to run the docker:
 ```
-sudo docker run -p 49160:8080 -e BUDGET_ID="b0f1e0fa-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" lordvault/node-actual-budget-rest-api
+sudo docker run -p 49160:8080 -e BUDGET_ID="b0f1e0fa-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" ghcr.io/lordvault/actual-budget-rest-api:latest
 ```
 
 REST SERVICE PARAMS:
