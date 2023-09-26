@@ -95,6 +95,7 @@ function validateEmpty(fieldName, field){
 
 function validateAmount(amount){
   try {
+    console.log(typeof amount);
     if(typeof amount == "string"){
       amount = Number(amount);
     }
