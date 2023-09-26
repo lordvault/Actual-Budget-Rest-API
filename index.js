@@ -51,13 +51,12 @@ function addTransaction(accountId, transactionDate, amount, payee, notes){
             payee_name: payee,
             notes: notes,
           },
-        ]).catch(err);
+        ])
   
         await api.shutdown();
 
       } catch(err){
-        console.log(err);
-        console.log('ERROR REQUESTING SERVER', timeout, 'ms');
+        console.log('ERROR REQUESTING SERVER');
         return false;
       }
       
