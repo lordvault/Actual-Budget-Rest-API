@@ -38,6 +38,8 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     amount = validateEmpty("Amount", amount);
     payee = validateEmpty("Payee", payee);
 
+    console.log("Startin process for:  "+transactionDate +" - "+amount+" - "+payee+" - "+notes);
+
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
       // Budget data will be cached locally here, in subdirectories for each file.
@@ -65,7 +67,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw new Error("Error downloading budget");
     });
 
-    console.log("Importing transaction "+transactionDate +" - "+amount+" - "+payee+" - "+notes);
+    
     await api.importTransactions(accountId, [
       {
         date: transactionDate,
@@ -88,7 +90,7 @@ function validateEmpty(fieldName, field){
   if (field == null || field == "") {
     throw new Error("Invalid "+fieldName+" value "+field);
   }
-  return typeof field == 'string' ? field.trim() : field;
+  return (field+"").trim();
 }
 
 function validateAmount(amount){
