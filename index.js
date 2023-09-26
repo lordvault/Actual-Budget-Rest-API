@@ -1,14 +1,9 @@
 let api = require('@actual-app/api');
-
 const express = require('express');
 const app = express();
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
-BUDGET_ID = process.env.BUDGET_ID;
-SERVER_URL = process.env.SERVER_URL;
-SERVER_PASSWORD = process.env.SERVER_PASSWORD;
-
 
 app.post('/', (req, res, next) => {
   console.log(req.body);
@@ -20,8 +15,16 @@ app.post('/', (req, res, next) => {
   }
 });
 
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+BUDGET_ID = process.env.BUDGET_ID;
+SERVER_URL = process.env.SERVER_URL;
+SERVER_PASSWORD = process.env.SERVER_PASSWORD;
+
 function addTransaction(accountId, transactionDate, amount, payee, notes){
-  try {
     (async () => {
       try {
         await api.init({
@@ -56,10 +59,7 @@ function addTransaction(accountId, transactionDate, amount, payee, notes){
       
     })();
     return true;
-  }catch(e) {
-    console.log(e);
-    return false;
-  }
+  
 }
 
 function getCurrentDatTimeFormatted(){
@@ -73,8 +73,6 @@ function getCurrentDatTimeFormatted(){
   return (year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
 }
 
-
-
 function getCurrentDateFormatted(){
   let date_time = new Date();
   let date = ("0" + date_time.getDate()).slice(-2);
@@ -83,5 +81,9 @@ function getCurrentDateFormatted(){
   return (year + "-" + month + "-" + date );
 }
 
-
-app.listen(8080);
+try{
+  app.listen(8080);
+}catch(e) {
+  console.log(e);
+  return false;
+}
