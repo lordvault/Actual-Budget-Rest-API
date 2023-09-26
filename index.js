@@ -34,6 +34,10 @@ SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     amount = validateAmount(amount);
+    accountId = validateEmpty("AccountId", accountId);
+    transactionDate = validateEmpty("Date", transactionDate);
+    amount = validateEmpty("Amount", amount);
+    payee = validateEmpty("Payee", payee);
 
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
@@ -79,6 +83,13 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     console.log("Shutting down comunication");
     await api.shutdown();
     return true;
+}
+
+function validateEmpty(fieldName, field){
+  if (username == null || username == "") {
+    throw new Error("Invalid "+fieldName+" value");
+  }
+  return field.trim();
 }
 
 function validateAmount(amount){
