@@ -23,30 +23,37 @@ app.post('/', (req, res, next) => {
 function addTransaction(accountId, transactionDate, amount, payee, notes){
   try {
     (async () => {
-      await api.init({
-        // Budget data will be cached locally here, in subdirectories for each file.
-        dataDir: '/tmp/actual',
-        // This is the URL of your running server
-        serverURL: SERVER_URL,
-        // This is the password you use to log into the server
-        password: SERVER_PASSWORD,
-      });
-      var current_date = getCurrentDatTimeFormatted();
-      notes= 'API-created '+current_date+" - "+notes;
+      try {
+        await api.init({
+          // Budget data will be cached locally here, in subdirectories for each file.
+          dataDir: '/tmp/actual',
+          // This is the URL of your running server
+          serverURL: SERVER_URL,
+          // This is the password you use to log into the server
+          password: SERVER_PASSWORD,
+        });
+        var current_date = getCurrentDatTimeFormatted();
+        notes= 'API-created '+current_date+" - "+notes;
 
-      // This is the ID from Settings → Show advanced settings → Sync ID
-      await api.downloadBudget(BUDGET_ID);
+        // This is the ID from Settings → Show advanced settings → Sync ID
+        await api.downloadBudget(BUDGET_ID);
 
-      await api.importTransactions(accountId, [
-        {
-          date: transactionDate,
-          amount: amount,
-          payee_name: payee,
-          notes: notes,
-        },
-      ]);
+        await api.importTransactions(accountId, [
+          {
+            date: transactionDate,
+            amount: amount,
+            payee_name: payee,
+            notes: notes,
+          },
+        ]);
+  
+        await api.shutdown();
 
-      await api.shutdown();
+      } catch(err){
+        console.log('ERROR REQUESTING SERVER', timeout, 'ms');
+        return false;
+      }
+      
     })();
     return true;
   }catch(e) {
