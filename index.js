@@ -25,6 +25,9 @@ SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 
 function addTransaction(accountId, transactionDate, amount, payee, notes){
+  if(typeof amount == "string"){
+    amount= Number(amount);
+  }
     (async () => {
       try {
         await api.init({
@@ -48,7 +51,7 @@ function addTransaction(accountId, transactionDate, amount, payee, notes){
             payee_name: payee,
             notes: notes,
           },
-        ]);
+        ]).catch(err);
   
         await api.shutdown();
 
