@@ -16,7 +16,7 @@ app.post('/', (req, res, next) => {
         res.json({ error: 'Internal error, please review docker logs.' })
       }    
     }).catch((reason) => {
-      console.log();
+      console.log("Messsage:"+reason);
       res.json({ error: 'Internal error, please review docker logs.' });
     });
   
@@ -33,6 +33,7 @@ SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
   try {
+    console.log("Connecting to server "+SERVER_URL);
     const init = await api.init({
       // Budget data will be cached locally here, in subdirectories for each file.
       dataDir: '/tmp/actual',
@@ -51,6 +52,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     var current_date = getCurrentDatTimeFormatted();
     notes= 'API-created '+current_date+" - "+notes;
 
+    console.log("Downloading budget");
     // This is the ID from Settings → Show advanced settings → Sync ID
     const download = await api.downloadBudget(BUDGET_ID);
     download.catch((error) => {
@@ -58,6 +60,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw error;
     });
 
+    console.log("Importing transaction");
     const import_trans = await api.importTransactions(accountId, [
       {
         date: transactionDate,
@@ -72,13 +75,15 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw error;
     });
 
+    console.log("Shutting down comunication");
     await api.shutdown();
     return true;
 
   } catch(err){
     console.log('ERROR REQUESTING SERVER');
+    console.error(err);
+    return false;
   }
-  return false;
 }
 
 function getCurrentDatTimeFormatted(){
