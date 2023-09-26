@@ -10,7 +10,7 @@ app.post('/', (req, res, next) => {
   addTransaction(req.body.accountId, getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes)
     .then((response) => {
       console.log(response);
-      if(result){
+      if(response){
         res.send('Success');
       }else{
         res.json({ error: 'Internal error, please review docker logs.' })
@@ -33,6 +33,8 @@ SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
   try {
+    amount = validateAmount(amount);
+    
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
       // Budget data will be cached locally here, in subdirectories for each file.
@@ -73,6 +75,17 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     console.log('ERROR REQUESTING SERVER');
     console.error(err);
     return false;
+  }
+}
+
+function validateAmount(amount){
+  try {
+    if(typeof amount == "string"){
+      amount = Number(amount);
+    }
+    return amount;
+  }catch(err){
+    throw new Error("Invalid Amount format");
   }
 }
 
