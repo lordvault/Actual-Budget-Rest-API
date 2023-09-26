@@ -35,7 +35,6 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     amount = validateAmount(amount);
     accountId = validateEmpty("AccountId", accountId);
-    transactionDate = validateEmpty("Date", transactionDate);
     amount = validateEmpty("Amount", amount);
     payee = validateEmpty("Payee", payee);
 
@@ -87,9 +86,9 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
 function validateEmpty(fieldName, field){
   if (field == null || field == "") {
-    throw new Error("Invalid "+fieldName+" value");
+    throw new Error("Invalid "+fieldName+" value "+field);
   }
-  return field.trim();
+  return typeof field == 'string' ? field.trim() : field;
 }
 
 function validateAmount(amount){
