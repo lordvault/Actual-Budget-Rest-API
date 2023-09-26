@@ -16,8 +16,8 @@ app.post('/', (req, res, next) => {
         res.json({ error: 'Internal error, please review docker logs.' })
       }    
     }).catch((reason) => {
-      console.log("Messsage:"+reason);
-      res.json({ error: 'Internal error, please review docker logs.' });
+      console.log("Messsage: "+reason);
+      res.json({ error: 'Internal error, please review docker logs.' +reason });
     });
   
 });
@@ -32,9 +32,9 @@ SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
-  try {
+
     amount = validateAmount(amount);
-    
+
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
       // Budget data will be cached locally here, in subdirectories for each file.
@@ -45,7 +45,10 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       password: SERVER_PASSWORD,
     })
     .then((response) => console.log("End initialization"))
-    .catch((reason) => console.log("1 - Error found: "+reason));
+    .catch((reason) => {
+      console.log("1 - Error found: "+reason);
+      throw new Error("Error initializating app");
+    });
 
     var current_date = getCurrentDatTimeFormatted();
     notes= 'API-created '+current_date+" - "+notes;
@@ -54,9 +57,12 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     // This is the ID from Settings → Show advanced settings → Sync ID
     await api.downloadBudget(BUDGET_ID)
     .then((response) => console.log("Budget downloaded!"))
-    .catch((reason) => console.log("2 - Error found: "+reason));
+    .catch((reason) => {
+      console.log("2 - Error found: "+reason);
+      throw new Error("Error downloading budget");
+    });
 
-    console.log("Importing transaction");
+    console.log("Importing transaction "+transactionDate +" - "+amount+" - "+payee+" - "+notes);
     await api.importTransactions(accountId, [
       {
         date: transactionDate,
@@ -65,17 +71,14 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
         notes: notes,
       },
     ]).then((response) => console.log("Transaction imported!"))
-    .catch((reason) => console.log("2 - Error found: "+reason));
+    .catch((reason) => { 
+      console.log("3 - Error found: "+reason)
+      throw new Error("Error importing transaction");
+    });
 
     console.log("Shutting down comunication");
     await api.shutdown();
     return true;
-
-  } catch(err){
-    console.log('ERROR REQUESTING SERVER');
-    console.error(err);
-    return false;
-  }
 }
 
 function validateAmount(amount){
