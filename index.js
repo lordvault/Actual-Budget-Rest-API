@@ -86,7 +86,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 }
 
 function validateEmpty(fieldName, field){
-  if (username == null || username == "") {
+  if (field == null || field == "") {
     throw new Error("Invalid "+fieldName+" value");
   }
   return field.trim();
