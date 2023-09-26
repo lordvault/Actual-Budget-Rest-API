@@ -42,34 +42,28 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       // This is the password you use to log into the server
       password: SERVER_PASSWORD,
     })
-    .then((response) => console.log("Finaliza init"))
-    .catch((reason) => console.log("Error found: "+reason));
+    .then((response) => console.log("End initialization"))
+    .catch((reason) => console.log("1 - Error found: "+reason));
 
     var current_date = getCurrentDatTimeFormatted();
     notes= 'API-created '+current_date+" - "+notes;
 
     console.log("Downloading budget");
     // This is the ID from Settings → Show advanced settings → Sync ID
-    const download = await api.downloadBudget(BUDGET_ID);
-    download.catch((error) => {
-      console.error(error);
-      throw error;
-    });
+    await api.downloadBudget(BUDGET_ID)
+    .then((response) => console.log("Budget downloaded!"))
+    .catch((reason) => console.log("2 - Error found: "+reason));
 
     console.log("Importing transaction");
-    const import_trans = await api.importTransactions(accountId, [
+    await api.importTransactions(accountId, [
       {
         date: transactionDate,
         amount: amount,
         payee_name: payee,
         notes: notes,
       },
-    ])
-
-    import_trans.catch((error) => {
-      console.error(error);
-      throw error;
-    });
+    ]).then((response) => console.log("Transaction imported!"))
+    .catch((reason) => console.log("2 - Error found: "+reason));
 
     console.log("Shutting down comunication");
     await api.shutdown();
