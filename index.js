@@ -7,12 +7,19 @@ app.use(express.urlencoded({ extended: true }))
 
 app.post('/', (req, res, next) => {
   console.log(req.body);
-  var result = addTransaction(req.body.accountId, getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes);
-  if(result){
-    res.send('Success');
-  }else{
-    res.json({ error: 'Internal error, please review docker logs.' })
-  }
+  addTransaction(req.body.accountId, getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes)
+    .then((response) => {
+      console.log(response);
+      if(result){
+        res.send('Success');
+      }else{
+        res.json({ error: 'Internal error, please review docker logs.' })
+      }    
+    }).catch((reason) => {
+      console.log();
+      res.json({ error: 'Internal error, please review docker logs.' });
+    });
+  
 });
 
 app.use(function(err, req, res, next) {
@@ -24,45 +31,54 @@ BUDGET_ID = process.env.BUDGET_ID;
 SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 
-function addTransaction(accountId, transactionDate, amount, payee, notes){
-  if(typeof amount == "string"){
-    amount= Number(amount);
-  }
-    (async () => {
-      try {
-        await api.init({
-          // Budget data will be cached locally here, in subdirectories for each file.
-          dataDir: '/tmp/actual',
-          // This is the URL of your running server
-          serverURL: SERVER_URL,
-          // This is the password you use to log into the server
-          password: SERVER_PASSWORD,
-        });
-        var current_date = getCurrentDatTimeFormatted();
-        notes= 'API-created '+current_date+" - "+notes;
+async function addTransaction(accountId, transactionDate, amount, payee, notes){
+  try {
+    const init = await api.init({
+      // Budget data will be cached locally here, in subdirectories for each file.
+      dataDir: '/tmp/actual',
+      // This is the URL of your running server
+      serverURL: SERVER_URL,
+      // This is the password you use to log into the server
+      password: SERVER_PASSWORD,
+    });
 
-        // This is the ID from Settings → Show advanced settings → Sync ID
-        await api.downloadBudget(BUDGET_ID);
+    init.catch((error) => {
+      console.error(error);
+      throw error;
+    });
 
-        await api.importTransactions(accountId, [
-          {
-            date: transactionDate,
-            amount: amount,
-            payee_name: payee,
-            notes: notes,
-          },
-        ])
-  
-        await api.shutdown();
 
-      } catch(err){
-        console.log('ERROR REQUESTING SERVER');
-        return false;
-      }
-      
-    })();
+    var current_date = getCurrentDatTimeFormatted();
+    notes= 'API-created '+current_date+" - "+notes;
+
+    // This is the ID from Settings → Show advanced settings → Sync ID
+    const download = await api.downloadBudget(BUDGET_ID);
+    download.catch((error) => {
+      console.error(error);
+      throw error;
+    });
+
+    const import_trans = await api.importTransactions(accountId, [
+      {
+        date: transactionDate,
+        amount: amount,
+        payee_name: payee,
+        notes: notes,
+      },
+    ])
+
+    import_trans.catch((error) => {
+      console.error(error);
+      throw error;
+    });
+
+    await api.shutdown();
     return true;
-  
+
+  } catch(err){
+    console.log('ERROR REQUESTING SERVER');
+  }
+  return false;
 }
 
 function getCurrentDatTimeFormatted(){
