@@ -34,20 +34,16 @@ SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
   try {
     console.log("Connecting to server "+SERVER_URL);
-    const init = await api.init({
+    await api.init({
       // Budget data will be cached locally here, in subdirectories for each file.
       dataDir: '/tmp/actual',
       // This is the URL of your running server
       serverURL: SERVER_URL,
       // This is the password you use to log into the server
       password: SERVER_PASSWORD,
-    });
-
-    init.catch((error) => {
-      console.error(error);
-      throw error;
-    });
-
+    })
+    .then((response) => console.log("Finaliza init"))
+    .catch((reason) => console.log("Error found: "+reason));
 
     var current_date = getCurrentDatTimeFormatted();
     notes= 'API-created '+current_date+" - "+notes;
