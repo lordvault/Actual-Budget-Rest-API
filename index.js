@@ -13,11 +13,11 @@ app.post('/', (req, res, next) => {
       if(response){
         res.json({status: 'Success'});
       }else{
-        res.json({status: 'Error', error: 'Internal error, please review docker logs.'})
+        res.status(500).json({status: 'Error', error: 'Internal error, please review docker logs.'})
       }    
     }).catch((reason) => {
-      console.log("Messsage: "+reason);
-      res.status(500).json({ error: 'Internal error, please review docker logs.' +reason });
+      console.log(reason);
+      res.status(500).json({status: 'Error', error: 'Internal error, please review docker logs.' +reason });
     });
   
 });
