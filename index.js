@@ -35,10 +35,9 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     amount = validateAmount(amount);
     accountId = validateEmpty("AccountId", accountId);
-    amount = validateEmpty("Amount", amount);
     payee = validateEmpty("Payee", payee);
 
-    console.log("Startin process for:  "+transactionDate +" - "+amount+" - "+payee+" - "+notes);
+    console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes);
 
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
