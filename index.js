@@ -1,6 +1,7 @@
 let api = require('@actual-app/api');
 const express = require('express');
 const app = express();
+const crypto = require('crypto');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -30,6 +31,7 @@ app.use(function(err, req, res, next) {
 BUDGET_ID = process.env.BUDGET_ID;
 SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
+GENERATE_UNIC_ID = process.env.GENERATE_UNIC_ID ?? false;
 
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
@@ -66,15 +68,20 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw new Error("Error downloading budget");
     });
 
+
+    var transaction = {
+      date: transactionDate,
+      amount: amount,
+      payee_name: payee,
+      notes: notes,
+    };
     
-    await api.importTransactions(accountId, [
-      {
-        date: transactionDate,
-        amount: amount,
-        payee_name: payee,
-        notes: notes,
-      },
-    ]).then((response) => console.log("Transaction imported!"))
+    if(GENERATE_UNIC_ID){
+      transaction.imported_id = crypto.randomUUID();
+    }
+    
+    await api.importTransactions(accountId, [transaction])
+    .then((response) => console.log("Transaction imported!"))
     .catch((reason) => { 
       console.log("3 - Error found: "+reason)
       throw new Error("Error importing transaction");
