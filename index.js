@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.post('/', (req, res, next) => {
   console.log(req.body);
-  addTransaction(req.body.accountId, getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes)
+  addTransaction(req.body.accountId, req.body.date, req.body.amount, req.body.payee, req.body.notes)
     .then((response) => {
       console.log(response);
       if(response){
@@ -35,6 +35,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     amount = validateAmount(amount);
     accountId = validateEmpty("AccountId", accountId);
+    transactionDate = validateEmpty("transactionDate", accountId);
     payee = validateEmpty("Payee", payee);
 
     console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes);
