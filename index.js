@@ -24,7 +24,7 @@ app.post('/', (req, res, next) => {
 
 app.use(function(err, req, res, next) {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).send('Something broke! ');
 });
 
 BUDGET_ID = process.env.BUDGET_ID;
