@@ -126,6 +126,5 @@ function getCurrentDateFormatted(){
 try{
   app.listen(8080);
 }catch(e) {
-  console.log(e);
-  return false;
+  console.log("LAST CATCH!");
 }

@@ -18,8 +18,32 @@ Docker Environment params:
 
 Comand to run the docker:
 ```
-sudo docker run -p 49160:8080 -e BUDGET_ID="b0f1e0fa-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" ghcr.io/lordvault/actual-budget-rest-api:latest
+sudo docker run -p 49160:8080 -e BUDGET_ID="xxxxxxx-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" ghcr.io/lordvault/actual-budget-rest-api:latest
 ```
+
+docker-compose:
+
+```
+version: "3"
+services:
+
+  actual-rest-api:
+    image: ghcr.io/lordvault/actual-budget-rest-api:latest
+    restart: always
+    container_name: actual-rest-api
+    network_mode: host
+    ports:
+      # Host port 49160 is mapped to container port 8080
+      - 49160:8080
+    environment:
+      # The container is run as the user with this PUID and PGID (user and group id).
+      # - TZ=${TZ} Optional, this avoid date issues for transactions
+      - SERVER_URL="https://actual.myhostserver.com"
+      - SERVER_PASSWORD="myActualPassword"
+      - BUDGET_ID="xxxxxx-7e2b-404e-8399-ccbf88442328"
+```     
+
+
 
 REST SERVICE PARAMS:
 -
@@ -41,6 +65,9 @@ curl --location 'http://actual.myhostserver.com/' \
     "notes": "Tasker"
 }'
 ```
+
+
+
 
 
 
