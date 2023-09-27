@@ -38,7 +38,7 @@ services:
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
       # - TZ=${TZ} Optional, this avoid date issues for transactions
-      # - GENERATE_UNIC_ID=true   => This generates a unic id to each transactions, can allow duplicated items with same information (amount, payee, same date)
+      # - GENERATE_UNIC_ID=true   => This generates a unique id to each transactions, can allow duplicated items with same information (amount, payee, same date)
       - SERVER_URL=https://actual.myhostserver.com
       - SERVER_PASSWORD=myActualPassword
       - BUDGET_ID=xxxxxx-7e2b-404e-8399-ccbf88442328

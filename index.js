@@ -75,10 +75,13 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       payee_name: payee,
       notes: notes,
     };
-    
+
     if(GENERATE_UNIC_ID){
+      console.log("Adding unique id to transaction")
       transaction.imported_id = crypto.randomUUID();
     }
+
+    console.log(transaction);
     
     await api.importTransactions(accountId, [transaction])
     .then((response) => console.log("Transaction imported!"))
