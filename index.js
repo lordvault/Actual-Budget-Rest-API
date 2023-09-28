@@ -20,7 +20,6 @@ app.post('/', (req, res, next) => {
       console.log(reason);
       res.status(500).json({status: 'Error', error: 'Internal error, please review docker logs.' +reason });
     });
-  
 });
 
 app.use(function(err, req, res, next) {
