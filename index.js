@@ -1,6 +1,7 @@
 let api = require('@actual-app/api');
 const express = require('express');
 const app = express();
+const crypto = require('crypto');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -19,17 +20,17 @@ app.post('/', (req, res, next) => {
       console.log(reason);
       res.status(500).json({status: 'Error', error: 'Internal error, please review docker logs.' +reason });
     });
-  
 });
 
 app.use(function(err, req, res, next) {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).send('Something broke! ');
 });
 
 BUDGET_ID = process.env.BUDGET_ID;
 SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
+GENERATE_UNIC_ID = process.env.GENERATE_UNIC_ID ?? false;
 
 async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
@@ -66,15 +67,23 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw new Error("Error downloading budget");
     });
 
+
+    var transaction = {
+      date: transactionDate,
+      amount: amount,
+      payee_name: payee,
+      notes: notes,
+    };
+
+    if(GENERATE_UNIC_ID){
+      console.log("Adding unique id to transaction")
+      transaction.imported_id = crypto.randomUUID();
+    }
+
+    console.log(transaction);
     
-    await api.importTransactions(accountId, [
-      {
-        date: transactionDate,
-        amount: amount,
-        payee_name: payee,
-        notes: notes,
-      },
-    ]).then((response) => console.log("Transaction imported!"))
+    await api.importTransactions(accountId, [transaction])
+    .then((response) => console.log("Transaction imported!"))
     .catch((reason) => { 
       console.log("3 - Error found: "+reason)
       throw new Error("Error importing transaction");
@@ -124,8 +133,7 @@ function getCurrentDateFormatted(){
 }
 
 try{
-  app.listen(8080);
+  app.listen(49160);
 }catch(e) {
-  console.log(e);
-  return false;
+  console.log("LAST CATCH!");
 }
