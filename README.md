@@ -50,6 +50,17 @@ TZ = Your timezone, ie America/Bogota. Review your Actual server has the same ti
 
 
 
+TAXES FILE:
+-
+```
+account-id-to-apply-tax:
+ 4x1000:
+  formula: "(value / 1000) * 4"
+ retencion:
+  formula: "(value * 0.25)"
+```
+
+
 REST SERVICE PARAMS:
 -
 - accountId: The id of the account to add the transaction. (you can get the id from the URL of the actual UI)
