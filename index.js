@@ -1,14 +1,13 @@
 let api = require('@actual-app/api');
 const express = require('express');
 const app = express();
-const crypto = require('crypto');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.post('/', (req, res, next) => {
   console.log(req.body);
-  addTransaction(req.body.accountId, getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes)
+  addTransaction(req.body.account_id, req.body.transaction_date, req.body.amount, req.body.payee, req.body.notes, req.body.transaction_id)
     .then((response) => {
       console.log(response);
       if(response){
@@ -30,15 +29,14 @@ app.use(function(err, req, res, next) {
 BUDGET_ID = process.env.BUDGET_ID;
 SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
-GENERATE_UNIC_ID = process.env.GENERATE_UNIC_ID ?? false;
 
-async function addTransaction(accountId, transactionDate, amount, payee, notes){
-
-    amount = validateAmount(amount);
+async function addTransaction(accountId, transactionDate, amount, payee, notes, transaction_id){
+    
+  amount = validateAmount(amount);
     accountId = validateEmpty("AccountId", accountId);
     payee = validateEmpty("Payee", payee);
 
-    console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes);
+    console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes+"| - |"+transaction_id);
 
     console.log("Connecting to server "+SERVER_URL);
     await api.init({
@@ -55,9 +53,6 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       throw new Error("Error initializating app");
     });
 
-    var current_date = getCurrentDatTimeFormatted();
-    notes= 'API-created '+current_date+" - "+notes;
-
     console.log("Downloading budget");
     // This is the ID from Settings → Show advanced settings → Sync ID
     await api.downloadBudget(BUDGET_ID)
@@ -73,12 +68,8 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
       amount: amount,
       payee_name: payee,
       notes: notes,
+      imported_id: transaction_id,
     };
-
-    if(GENERATE_UNIC_ID){
-      console.log("Adding unique id to transaction")
-      transaction.imported_id = crypto.randomUUID();
-    }
 
     console.log(transaction);
     
@@ -92,6 +83,39 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     console.log("Shutting down comunication");
     await api.shutdown();
     return true;
+}
+
+async function getAccounts(){
+  console.log("Connecting to server "+SERVER_URL);
+  await api.init({
+    // Budget data will be cached locally here, in subdirectories for each file.
+    dataDir: './tmp',
+    // This is the URL of your running server
+    serverURL: SERVER_URL,
+    // This is the password you use to log into the server
+    password: SERVER_PASSWORD,
+  })
+  .then((response) => console.log("End initialization"))
+  .catch((reason) => {
+    console.log("1 - Error found: "+reason);
+    throw new Error("Error initializating app");
+  });
+
+  console.log("Downloading budget");
+  // This is the ID from Settings → Show advanced settings → Sync ID
+  await api.downloadBudget(BUDGET_ID)
+  .then((response) => console.log("Budget downloaded!"))
+  .catch((reason) => {
+    console.log("2 - Error found: "+reason);
+    throw new Error("Error downloading budget");
+  });
+
+  let accounts = await getAccounts();
+  console.log(accounts);
+
+  console.log("Shutting down comunication");
+  await api.shutdown();
+  return true;
 }
 
 function validateEmpty(fieldName, field){
@@ -113,7 +137,7 @@ function validateAmount(amount){
   }
 }
 
-function getCurrentDatTimeFormatted(){
+function getCurrentDateTimeFormatted(){
   let date_time = new Date();
   let date = ("0" + date_time.getDate()).slice(-2);
   let month = ("0" + (date_time.getMonth() + 1)).slice(-2);
@@ -133,7 +157,7 @@ function getCurrentDateFormatted(){
 }
 
 try{
-  app.listen(49160);
+  app.listen(8080);
 }catch(e) {
   console.log("LAST CATCH!");
 }
