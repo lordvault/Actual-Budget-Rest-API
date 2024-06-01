@@ -37,8 +37,8 @@ services:
       - 49160:8080
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
-      # - TZ=${TZ} Optional, this avoid date issues for transactions
-      # - GENERATE_UNIC_ID=true 
+      # - GENERATE_UNIC_ID=true
+      - TZ=America/Bogota
       - SERVER_URL=https://actual.myhostserver.com
       - SERVER_PASSWORD=myActualPassword
       - BUDGET_ID=xxxxxx-7e2b-404e-8399-ccbf88442328
@@ -46,7 +46,7 @@ services:
 
 GENERATE_UNIC_ID = Boolean, this generates an unique id for each transaction. https://actualbudget.org/docs/api/reference#transaction they mention "Transactions with the same imported_id will never be added more than once.". But anyways 2 transaction with different imported_id, are not created twice. (NOT WORKING)
 
-TZ = Your timezone, ie America/Bogota. Review your Actual server has the same timezone. 
+TZ = Your timezone, ie America/Bogota. Your Actual server should have the same timezone. 
 
 
 
