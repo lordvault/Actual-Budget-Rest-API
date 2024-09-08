@@ -5,11 +5,50 @@ const app = express();
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+BUDGET_ID = process.env.BUDGET_ID;
+SERVER_URL = process.env.SERVER_URL;
+SERVER_PASSWORD = process.env.SERVER_PASSWORD;
+
+let apiInitialized = false;
+
+async function initializeApi() {
+  console.log("Connecting to server "+SERVER_URL);
+  await api.init({
+    dataDir: '/tmp/actual',
+    // dataDir: './tmp',
+    serverURL: SERVER_URL,
+    password: SERVER_PASSWORD,
+  })
+  .then(() => {
+    console.log("API initialized");
+    apiInitialized = true;
+  })
+  .catch((reason) => {
+    console.log("Error initializing API: "+reason);
+    throw new Error("Error initializing API");
+  });
+
+  console.log("Downloading budget");
+  // This is the ID from Settings → Show advanced settings → Sync ID
+  await api.downloadBudget(BUDGET_ID)
+  .then((response) => console.log("Budget downloaded!"))
+  .catch((reason) => {
+    console.log("2 - Error found: "+reason);
+    throw new Error("Error downloading budget");
+  });
+}
+
+initializeApi();
+
+app.get('/healthcheck', (req, res) => {
+  res.json({status: 'ok'});
+});
+
 app.post('/', (req, res, next) => {
+  console.log("POST / received")
   console.log(req.body);
   addTransaction(req.body.account_id, req.body.transaction_date, req.body.amount, req.body.payee, req.body.notes, req.body.transaction_id)
     .then((response) => {
-      console.log(response);
       if(response){
         res.json({status: 'Success'});
       }else{
@@ -26,53 +65,24 @@ app.use(function(err, req, res, next) {
   res.status(500).send('Something broke! ');
 });
 
-BUDGET_ID = process.env.BUDGET_ID;
-SERVER_URL = process.env.SERVER_URL;
-SERVER_PASSWORD = process.env.SERVER_PASSWORD;
-
-async function addTransaction(accountId, transactionDate, amount, payee, notes, transaction_id){
+async function addTransaction(accountId, transactionDate, amount, payee, notes, imported_id){
+  if (!apiInitialized) {
+    throw new Error("API not initialized");
+  }
     
   amount = validateAmount(amount);
     accountId = validateEmpty("AccountId", accountId);
     payee = validateEmpty("Payee", payee);
-
-    console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes+"| - |"+transaction_id);
-
-    console.log("Connecting to server "+SERVER_URL);
-    await api.init({
-      // Budget data will be cached locally here, in subdirectories for each file.
-      dataDir: '/tmp/actual',
-      // This is the URL of your running server
-      serverURL: SERVER_URL,
-      // This is the password you use to log into the server
-      password: SERVER_PASSWORD,
-    })
-    .then((response) => console.log("End initialization"))
-    .catch((reason) => {
-      console.log("1 - Error found: "+reason);
-      throw new Error("Error initializating app");
-    });
-
-    console.log("Downloading budget");
-    // This is the ID from Settings → Show advanced settings → Sync ID
-    await api.downloadBudget(BUDGET_ID)
-    .then((response) => console.log("Budget downloaded!"))
-    .catch((reason) => {
-      console.log("2 - Error found: "+reason);
-      throw new Error("Error downloading budget");
-    });
-
 
     var transaction = {
       date: transactionDate,
       amount: amount,
       payee_name: payee,
       notes: notes,
-      imported_id: transaction_id,
+      imported_id: imported_id,
     };
+    console.log("Starting process for: |"+transaction.date +"| - |"+transaction.amount+"| - |"+transaction.payee_name+"| - |"+transaction.notes+"| - |"+transaction.imported_id+"|");
 
-    console.log(transaction);
-    
     await api.importTransactions(accountId, [transaction])
     .then((response) => console.log("Transaction imported!"))
     .catch((reason) => { 
@@ -80,28 +90,10 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes, 
       throw new Error("Error importing transaction");
     });
 
-    console.log("Shutting down comunication");
-    await api.shutdown();
     return true;
 }
 
 async function getAccounts(){
-  console.log("Connecting to server "+SERVER_URL);
-  await api.init({
-    // Budget data will be cached locally here, in subdirectories for each file.
-    dataDir: './tmp',
-    // This is the URL of your running server
-    serverURL: SERVER_URL,
-    // This is the password you use to log into the server
-    password: SERVER_PASSWORD,
-  })
-  .then((response) => console.log("End initialization"))
-  .catch((reason) => {
-    console.log("1 - Error found: "+reason);
-    throw new Error("Error initializating app");
-  });
-
-  console.log("Downloading budget");
   // This is the ID from Settings → Show advanced settings → Sync ID
   await api.downloadBudget(BUDGET_ID)
   .then((response) => console.log("Budget downloaded!"))
@@ -113,8 +105,6 @@ async function getAccounts(){
   let accounts = await getAccounts();
   console.log(accounts);
 
-  console.log("Shutting down comunication");
-  await api.shutdown();
   return true;
 }
 
@@ -137,24 +127,25 @@ function validateAmount(amount){
   }
 }
 
-function getCurrentDateTimeFormatted(){
-  let date_time = new Date();
-  let date = ("0" + date_time.getDate()).slice(-2);
-  let month = ("0" + (date_time.getMonth() + 1)).slice(-2);
-  let year = date_time.getFullYear();
-  let hours = date_time.getHours();
-  let minutes = date_time.getMinutes();
-  let seconds = date_time.getSeconds();
-  return (year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
-}
+process.on('exit', async (code) => {
+  console.log("Shutting down communication");
+  await api.shutdown();
+  console.log(`About to exit with code: ${code}`);
+});
 
-function getCurrentDateFormatted(){
-  let date_time = new Date();
-  let date = ("0" + date_time.getDate()).slice(-2);
-  let month = ("0" + (date_time.getMonth() + 1)).slice(-2);
-  let year = date_time.getFullYear();
-  return (year + "-" + month + "-" + date );
-}
+process.on('SIGINT', async () => {
+  console.log("Shutting down communication");
+  await api.shutdown();
+  console.log('Received SIGINT. Shutting down.');
+  process.exit();
+});
+
+process.on('uncaughtException', async (err) => {
+  console.log("Shutting down communication");
+  await api.shutdown();
+  console.log(`Uncaught exception: ${err}`);
+  process.exit(1);
+});
 
 try{
   app.listen(8080);
