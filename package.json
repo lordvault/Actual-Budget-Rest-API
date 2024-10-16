@@ -5,7 +5,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@actual-app/api": "^6.10.0",
+    "@actual-app/api": "^24.10.1",
     "express": "^4.19.2"
   }
 }

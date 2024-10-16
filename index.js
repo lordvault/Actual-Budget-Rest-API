@@ -41,6 +41,9 @@ async function initializeApi() {
 initializeApi();
 
 app.get('/healthcheck', (req, res) => {
+  if (!apiInitialized) {
+    throw new Error("API not initialized");
+  }
   res.json({status: 'ok'});
 });
 
