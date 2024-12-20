@@ -57,9 +57,3 @@ CURL to consume the API:
     "transaction_id": "29eb97e0-1d23-4440-8b89-XXXXXX"
 }'
 ```
-
-## Build instructions
-
-  docker build --platform linux/amd64 -t ghcr.io/paulcoates/actual-budget-rest-api .
-  docker tag c298edbf76a5 ghcr.io/paulcoates/actual-budget-rest-api:24.10.1
-  docker push ghcr.io/paulcoates/actual-budget-rest-api:24.10.1

@@ -50,7 +50,7 @@ app.get('/healthcheck', (req, res) => {
 app.post('/', (req, res, next) => {
   console.log("POST / received")
   console.log(req.body);
-  addTransaction(req.body.account_id, req.body.transaction_date, req.body.amount, req.body.payee, req.body.notes, req.body.transaction_id)
+  addTransaction(req.body.account_id, req.body.transaction_date, req.body.amount, req.body.payee, req.body.notes, req.body.imported_id)
     .then((response) => {
       if(response){
         res.json({status: 'Success'});
