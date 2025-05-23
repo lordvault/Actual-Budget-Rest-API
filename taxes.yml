@@ -1,0 +1,8 @@
+#The formula should follow the mathjs expressions.
+#check: https://mathjs.org/docs/expressions/parsing.html 
+#always use 'transactionAmount' to refer to the amount received on the api request
+account-id-to-apply-tax:
+ 4x1000:
+  formula: "(transactionAmount / 1000) * 4"
+ retencion:
+  formula: "(transactionAmount * 0.25)"
