@@ -2,6 +2,8 @@ name: Build and publish a Docker image to ghcr.io
 on:
   push:
     branches: [ "development" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
 
@@ -18,4 +20,4 @@ jobs:
         with:
           image_name: ${{ github.repository }}  # it will be lowercased internally
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          image_tag: development
+          image_tag: ${{ github.head_ref }}
