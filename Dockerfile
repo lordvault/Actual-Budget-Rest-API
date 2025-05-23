@@ -6,5 +6,5 @@ RUN apk add -U tzdata
 RUN apk add --no-cache python3 py3-pip
 RUN npm install
 COPY . .
-EXPOSE 8080
+EXPOSE 49160
 CMD [ "node", "index.js" ]

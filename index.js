@@ -134,6 +134,9 @@ function getCurrentDateFormatted(){
 
 try{
   app.listen(49160);
+  console.log("Starting application"+app);
+  console.log("Actual url:"+SERVER_URL);
+  console.log("Budget id:"+BUDGET_ID);
 }catch(e) {
   console.log("LAST CATCH!");
 }
