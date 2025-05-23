@@ -42,7 +42,7 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
     var baseTransaction = createTransaction(transactionDate, amount, payee, notes)
     transactionList.push(baseTransaction)
     for(const tax of taxesList ){
-      var taxTransaction = createTransaction(transactionDate, tax.value, payee+"-"+tax.name, notes);
+      var taxTransaction = createTransaction(transactionDate, tax.value, tax.name, notes);
       transactionList.push(taxTransaction)
     }
 

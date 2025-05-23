@@ -21,6 +21,13 @@ Comand to run the docker:
 sudo docker run -p 49160:8080 -e BUDGET_ID="xxxxxxx-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" ghcr.io/lordvault/actual-budget-rest-api:latest
 ```
 
+For use taxes feature add to the command this after the SERVER_PASSWORD:
+```
+ -v /home/localpc/some-path/taxes.yml:/actual/taxes/taxes.yml:ro ...
+```
+
+
+
 docker-compose:
 
 ```
@@ -41,6 +48,9 @@ services:
       - SERVER_URL=https://actual.myhostserver.com
       - SERVER_PASSWORD=myActualPassword
       - BUDGET_ID=xxxxxx-7e2b-404e-8399-ccbf88442328
+    #Optional mount to make use of Taxes feature.
+    #volumes:
+    #  - /home/localpc/some-path/taxes.yml:/actual/taxes/taxes.yml:ro  
 ```     
 
 GENERATE_UNIC_ID = Boolean, this generates an unique id for each transaction. https://actualbudget.org/docs/api/reference#transaction they mention "Transactions with the same imported_id will never be added more than once.". But anyways 2 transaction with different imported_id, are not created twice. (NOT WORKING)
@@ -51,14 +61,18 @@ TZ = Your timezone, ie America/Bogota. Review your Actual server has the same ti
 
 TAXES FILE:
 -
+
+In order to use taxes, you should create a file with this format:
 ```
 account-id-to-apply-tax:
  4x1000:
-  formula: "(value / 1000) * 4"
+  formula: "(transactionAmount / 1000) * 4"
  retencion:
-  formula: "(value * 0.25)"
+  formula: "(transactionAmount * 0.25)"
 ```
+In this example we have 2 taxes to apply to ALL the transactions received through the api service. The first one its named '4x1000' and second one is 'retencion'. As you can see both declare the formula field as a math expression, the only variable is 'transactionAmount' this refers to the amount of transaction received on the request.
 
+In case you dont require taxes feature, just leave commented the volumes section on docker-compose.
 
 REST SERVICE PARAMS:
 -
