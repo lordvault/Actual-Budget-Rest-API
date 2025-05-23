@@ -1,7 +1,7 @@
 Project API to create Transactions on 'Actual Budget'
 -
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/lordvault)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/lordvault)[<img src="mercado-pago.png" alt="Sample Image" width="120">](https://link.mercadopago.com.co/lordvault)
 
 [Actual Budget link](https://actualbudget.org/)
 
