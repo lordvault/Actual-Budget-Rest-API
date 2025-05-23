@@ -1,4 +1,3 @@
-let api = require('@actual-app/api');
 const express = require('express');
 const app = express();
 const crypto = require('crypto');
@@ -8,7 +7,7 @@ const utils = require('./utils');
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.post('/transaction', (req, res, next) => {
+app.post('/', (req, res, next) => {
   console.log(req.body);
   transactions.addTransaction(req.body.accountId, utils.getCurrentDateFormatted(), req.body.amount, req.body.payee, req.body.notes)
     .then((response) => {
@@ -33,29 +32,13 @@ BUDGET_ID = process.env.BUDGET_ID;
 SERVER_URL = process.env.SERVER_URL;
 SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 GENERATE_UNIC_ID = process.env.GENERATE_UNIC_ID ?? false;
-
-
-function validateEmpty(fieldName, field){
-  if (field == null || field == "") {
-    throw new Error("Invalid "+fieldName+" value "+field);
-  }
-  return (field+"").trim();
-}
-
-function validateAmount(amount){
-  try {
-    console.log(typeof amount);
-    if(typeof amount == "string"){
-      return Number(amount);
-    }
-    return amount;
-  }catch(err){
-    throw new Error("Invalid Amount format");
-  }
-}
+BASE_FILE_LOCATION = "/actual/taxes/"
 
 try{
   app.listen(49160);
+  console.log("Starting application");
+  console.log("Actual url:"+SERVER_URL);
+  console.log("Budget id:"+BUDGET_ID);
 }catch(e) {
   console.log("LAST CATCH!");
 }
