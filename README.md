@@ -1,12 +1,14 @@
 Project API to create Transactions on 'Actual Budget'
 -
 
--- Actual Budget link
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/lordvault)
 
-This project provides a docker image on nodejs 18, that allows consume the 'actual budget node sdk/api' to create transactions on a account.
+[Actual Budget link](https://actualbudget.org/)
+
+This project provides a docker image on nodejs 20, that allows consume the ['actual budget node sdk/api'](https://actualbudget.org/docs/api/) to create transactions on an account.
 
 
-The account must exist on the Actual Server.
+The account must exist on your Actual Server.
 
 Docker Environment params:
 -
@@ -98,7 +100,7 @@ curl --location 'http://actual.myhostserver.com/' \
 
 Personal usage
 - 
-This api was created to use with mobile app 'Tasker', reading the bank notifications i can get the Payee and amount information of my transactions. (For this moment only payments). 
+This api was created to use with mobile app [Tasker](https://tasker.joaoapps.com/), reading the bank notifications i can get the Payee and amount information of my transactions. (For this moment only payments). 
 With that information i avoid to have to enter manually the information on the 'Actual Budget' server.
 
 
@@ -108,9 +110,9 @@ Pending Features
 
 [ ] Support income transactions.
 
-[ ] Automatic taxes. In colombia some account adds a fee over the transaction named '4x1000'. The idea its to receive a flag on the request with the account, to apply the fee on the transaction.
+[x] ~~Automatic taxes. In colombia some account adds a fee over the transaction named '4x1000'. The idea its to receive a flag on the request with the account, to apply the fee on the transaction.~~
 
-[ ] 
+[ ] Validate server comunication before create transaction
  
 
 Detected Issues:
