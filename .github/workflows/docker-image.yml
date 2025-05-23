@@ -2,14 +2,12 @@ name: Build and publish a Docker image to ghcr.io
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
 
   build:
 
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-24.04"
 
     steps:
       - uses: actions/checkout@v2

@@ -33,8 +33,7 @@ services:
     container_name: actual-rest-api
     network_mode: host
     ports:
-      # Host port 49160 is mapped to container port 8080
-      - 49160:8080
+      - 49160:49160
     environment:
       # The container is run as the user with this PUID and PGID (user and group id).
       # - TZ=${TZ} Optional, this avoid date issues for transactions
