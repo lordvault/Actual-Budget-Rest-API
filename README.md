@@ -23,7 +23,7 @@ Comand to run the docker:
 sudo docker run -p 49160:8080 -e BUDGET_ID="xxxxxxx-7e2b-404e-8399-ccbf88442328" -e SERVER_URL="https://actual.myhostserver.com" -e SERVER_PASSWORD="myActualPassword" ghcr.io/lordvault/actual-budget-rest-api:latest
 ```
 
-For use taxes feature add to the command this after the SERVER_PASSWORD:
+To use taxes feature add to the command this after the SERVER_PASSWORD:
 ```
  -v /home/localpc/some-path/taxes.yml:/actual/taxes/taxes.yml:ro ...
 ```
@@ -74,6 +74,8 @@ account-id-to-apply-tax:
 ```
 In this example we have 2 taxes to apply to ALL the transactions received through the api service. The first one its named '4x1000' and second one is 'retencion'. As you can see both declare the formula field as a math expression, the only variable is 'transactionAmount' this refers to the amount of transaction received on the request.
 
+Update your docker run command or docker-compose file, to mount your file on the container location ``/actual/taxes/taxes.yml``
+
 In case you dont require taxes feature, just leave commented the volumes section on docker-compose.
 
 REST SERVICE PARAMS:
@@ -91,12 +93,13 @@ curl --location 'http://actual.myhostserver.com/' \
 --header 'Content-Type: application/json' \
 --data '{
     "accountId": "eeeeeeee-1111-4444-1111-d42a4a7b82cb",
-    "amount": 13500,
+    "amount": 1350000,
     "payee": "Banco de bogota",
     "notes": "Tasker"
 }'
 ```
-
+In this example we send a transaction from establishment 'Banco de bogota' for amount of 13.500,00 (remember sent the amount on cents). In this transaction i send a note with "Tasker" because usually i like to identify where comes the transaction. You can see this transaction note on the Actual UI, appended to a mention of 'API-create date time' . ie: 
+``API-created 2025-03-03 10:30:44 - tasker``
 
 Personal usage
 - 
@@ -114,7 +117,12 @@ Pending Features
 
 [ ] Validate server comunication before create transaction
  
+[ ] Add functional testing ? load testing ? unit testing ? 
 
 Detected Issues:
 - 
 - Sometimes a PostError its generated cuz the system cant communicate with the actual server. This breaks the system and stop the container.
+
+
+Throubleshots: 
+- Time in time, actual updates the api, this takes a little of effort updating the node libraries and verifying all still working as expected.
