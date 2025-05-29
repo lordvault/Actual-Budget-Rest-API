@@ -93,13 +93,16 @@ curl --location 'http://actual.myhostserver.com/' \
 --header 'Content-Type: application/json' \
 --data '{
     "accountId": "eeeeeeee-1111-4444-1111-d42a4a7b82cb",
-    "amount": 1350000,
+    "amount": -1350000,
     "payee": "Banco de bogota",
     "notes": "Tasker"
 }'
 ```
-In this example we send a transaction from establishment 'Banco de bogota' for amount of 13.500,00 (remember sent the amount on cents). In this transaction i send a note with "Tasker" because usually i like to identify where comes the transaction. You can see this transaction note on the Actual UI, appended to a mention of 'API-create date time' . ie: 
+In this example we send a transaction payment from establishment 'Banco de bogota' for amount of 13.500,00 (remember sent the amount on cents). In this transaction i send a note with "Tasker" because usually i like to identify where comes the transaction. You can see this transaction note on the Actual UI, appended to a mention of 'API-create date time' . ie: 
 ``API-created 2025-03-03 10:30:44 - tasker``
+
+
+Important: The negative value represent a payment, a positive value represents an income or deposite.
 
 Personal usage
 - 
