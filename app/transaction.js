@@ -84,7 +84,7 @@ function validateEmpty(fieldName, field){
 
 function validateAmount(amount) {
   const numericAmount = Number(amount);
-  if (isNaN(numericAmount) || numericAmount <= 0) {
+  if (isNaN(numericAmount)) {
     throw new Error("Invalid Amount");
   }
   return numericAmount;
