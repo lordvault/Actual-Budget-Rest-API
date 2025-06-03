@@ -31,7 +31,7 @@ function evaluateTaxes(transactionAmount, accountId){
       formula = formula.replace("transactionAmount", transactionAmount)
       var taxMap = {
         name:key,
-        value:math.evaluate(formula)
+        value:Math.round(math.evaluate(formula))
       }
       taxesList.push(taxMap)
     }
