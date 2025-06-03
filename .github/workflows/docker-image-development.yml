@@ -13,11 +13,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        name: Checkout
 
-      # https://github.com/marketplace/actions/push-to-ghcr
       - name: Build and publish a Docker image for ${{ github.repository }}
-        uses: macbre/push-to-ghcr@master
+        uses: docker/build-push-action@v2
         with:
-          image_name: ${{ github.repository }}  # it will be lowercased internally
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          image_tag: ${{ github.head_ref }}
+            platforms: linux/amd64,linux/arm64,linux/arm/v7
+            push: true
+            tags: ghcr.io/lordvault/actual-budget-rest-api:${{ github.head_ref }}
