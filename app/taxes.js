@@ -41,4 +41,4 @@ function evaluateTaxes(transactionAmount, accountId){
   return taxesList
 }
 
-module.exports = {evaluateTaxes};
+module.exports = {evaluateTaxes, readTaxesFile};

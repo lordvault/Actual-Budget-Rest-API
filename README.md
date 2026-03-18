@@ -120,7 +120,18 @@ Pending Features
 
 [ ] Validate server comunication before create transaction
  
-[ ] Add functional testing ? load testing ? unit testing ? 
+[x] ~~Add functional testing ? load testing ? unit testing ?~~
+
+Development and Testing
+-
+To run the unit tests, you need to have the dependencies installed. You can execute the tests using npm:
+
+```bash
+npm install
+npm test
+```
+
+The tests use Jest and Supertest to verify the API endpoints without needing a live Actual Budget server, as the external services are mocked.
 
 Detected Issues:
 - 
