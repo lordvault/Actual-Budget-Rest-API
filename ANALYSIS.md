@@ -86,7 +86,7 @@ accounts:
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| @actual-app/api | 25.12.0 | Actual Budget SDK integration |
+| @actual-app/api | 26.3.0 | Actual Budget SDK integration (requires navigator shim) |
 | express | 4.21.2 | REST API framework |
 | mathjs | 14.5.0 | Mathematical expression evaluation |
 | js-yaml | 4.1.0 | YAML configuration parsing |
@@ -99,6 +99,10 @@ accounts:
 | BUDGET_ID | Target budget/workspace ID | Yes |
 | SERVER_PASSWORD | API authentication password | Yes |
 | GENERATE_UNIC_ID | Enable unique ID generation | Optional |
+
+### Environment Notes
+
+- **Navigator Shim**: Version 26.3.0 of `@actual-app/api` requires a `navigator` object. A shim is implemented in `app/transaction.js` and `test/index.test.js` to provide `global.navigator` for the Node.js environment.
 
 ## Architecture
 
@@ -549,6 +553,14 @@ accounts:
 - Test rate limiting
 - Test memory usage
 
+## Maintenance & Updates
+
+### March 19, 2026
+- **Dependency Update**: Upgraded `@actual-app/api` to `26.3.0`.
+- **Environment Compatibility**: Added `navigator` shim to `app/transaction.js` and tests to support version `26.3.0+` in Node.js.
+- **Bug Fix**: Resolved `ReferenceError: BASE_FILE_LOCATION` in `app/taxes.js` by correctly using `process.env.BASE_FILE_LOCATION`.
+- **Test Stability**: Updated `test/taxes.test.js` to correctly mock data structures and ensure test isolation using `resetAllMocks()`.
+
 ## Conclusion
 
 This REST API provides a functional integration between a custom system and Actual Budget, enabling programmatic transaction creation with tax calculations. While the basic functionality works, significant improvements are needed in error handling, security, and feature completeness before production use.
@@ -557,6 +569,6 @@ The modular architecture allows for easy extension, and the use of official SDKs
 
 ---
 
-**Generated**: March 11, 2026
-**Version**: 1.0.0
+**Generated**: March 19, 2026
+**Version**: 1.1.0
 **Author**: opencode analysis
