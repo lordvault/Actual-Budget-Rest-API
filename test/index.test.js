@@ -1,3 +1,9 @@
+if (typeof navigator === 'undefined') {
+  global.navigator = {
+    userAgent: 'node',
+  };
+}
+
 const request = require('supertest');
 const app = require('../app/index');
 const transactions = require('../app/transaction');
