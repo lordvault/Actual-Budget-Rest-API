@@ -7,7 +7,7 @@ jest.mock('js-yaml');
 
 describe('taxes.js', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     process.env.BASE_FILE_LOCATION = '/actual/taxes/';
   });
 
@@ -33,7 +33,7 @@ describe('taxes.js', () => {
     });
 
     it('should return parsed YAML data when file exists', () => {
-      const mockData = { accounts: { '123': { tax: 0.1 } } };
+      const mockData = { '123': { tax: 0.1 } };
       fs.existsSync.mockReturnValue(true);
       fs.readFileSync.mockReturnValue('test yaml content');
       yaml.load.mockReturnValue(mockData);
@@ -56,7 +56,7 @@ describe('taxes.js', () => {
 
   describe('evaluateTaxes', () => {
     it('should return empty array when taxes file is null', () => {
-      jest.spyOn(taxes, 'readTaxesFile').mockReturnValue(null);
+      fs.existsSync.mockReturnValue(false);
 
       const result = taxes.evaluateTaxes(1000, '123');
 
@@ -64,8 +64,10 @@ describe('taxes.js', () => {
     });
 
     it('should return empty array when account has no tax rules', () => {
-      const mockData = { accounts: { '456': { tax: 0.1 } } };
-      jest.spyOn(taxes, 'readTaxesFile').mockReturnValue(mockData);
+      const mockData = { '456': { tax: 0.1 } };
+      fs.existsSync.mockReturnValue(true);
+      fs.readFileSync.mockReturnValue('mock content');
+      yaml.load.mockReturnValue(mockData);
 
       const result = taxes.evaluateTaxes(1000, '123');
 
@@ -74,14 +76,14 @@ describe('taxes.js', () => {
 
     it('should calculate taxes correctly for an account', () => {
       const mockData = {
-        accounts: {
-          '123': {
-            'tax1': { formula: 'transactionAmount * 0.1' },
-            'tax2': { formula: 'transactionAmount * 0.05' }
-          }
+        '123': {
+          'tax1': { formula: 'transactionAmount * 0.1' },
+          'tax2': { formula: 'transactionAmount * 0.05' }
         }
       };
-      jest.spyOn(taxes, 'readTaxesFile').mockReturnValue(mockData);
+      fs.existsSync.mockReturnValue(true);
+      fs.readFileSync.mockReturnValue('mock content');
+      yaml.load.mockReturnValue(mockData);
 
       const result = taxes.evaluateTaxes(1000, '123');
 
@@ -93,13 +95,13 @@ describe('taxes.js', () => {
 
     it('should handle complex formulas', () => {
       const mockData = {
-        accounts: {
-          '123': {
-            'complexTax': { formula: 'round((transactionAmount + 10) * 0.12, 2)' }
-          }
+        '123': {
+          'complexTax': { formula: 'round((transactionAmount + 10) * 0.12, 0)' }
         }
       };
-      jest.spyOn(taxes, 'readTaxesFile').mockReturnValue(mockData);
+      fs.existsSync.mockReturnValue(true);
+      fs.readFileSync.mockReturnValue('mock content');
+      yaml.load.mockReturnValue(mockData);
 
       const result = taxes.evaluateTaxes(1000, '123');
 
@@ -110,15 +112,15 @@ describe('taxes.js', () => {
 
     it('should handle multiple tax rules per account', () => {
       const mockData = {
-        accounts: {
-          '123': {
-            'tax1': { formula: 'transactionAmount * 0.1' },
-            'tax2': { formula: 'transactionAmount * 0.05' },
-            'tax3': { formula: 'transactionAmount * 0.02' }
-          }
+        '123': {
+          'tax1': { formula: 'transactionAmount * 0.1' },
+          'tax2': { formula: 'transactionAmount * 0.05' },
+          'tax3': { formula: 'transactionAmount * 0.02' }
         }
       };
-      jest.spyOn(taxes, 'readTaxesFile').mockReturnValue(mockData);
+      fs.existsSync.mockReturnValue(true);
+      fs.readFileSync.mockReturnValue('mock content');
+      yaml.load.mockReturnValue(mockData);
 
       const result = taxes.evaluateTaxes(1000, '123');
 
