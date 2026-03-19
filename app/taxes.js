@@ -4,7 +4,7 @@ const fs = require('fs');
 
 function readTaxesFile(){
 
-  var filePath = BASE_FILE_LOCATION+"taxes.yml";
+  var filePath = process.env.BASE_FILE_LOCATION+"taxes.yml";
   console.log(filePath)
   if(!fs.existsSync(filePath)){
     console.log("file doesnt exists!")
@@ -41,4 +41,4 @@ function evaluateTaxes(transactionAmount, accountId){
   return taxesList
 }
 
-module.exports = {evaluateTaxes};
+module.exports = {evaluateTaxes, readTaxesFile};

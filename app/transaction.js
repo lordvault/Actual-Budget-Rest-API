@@ -1,3 +1,8 @@
+if (typeof navigator === 'undefined') {
+  global.navigator = {
+    userAgent: 'node',
+  };
+}
 let api = require('@actual-app/api');
 const utils = require('./utils');
 const taxes = require('./taxes');

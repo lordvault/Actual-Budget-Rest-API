@@ -34,11 +34,15 @@ SERVER_PASSWORD = process.env.SERVER_PASSWORD;
 GENERATE_UNIC_ID = process.env.GENERATE_UNIC_ID ?? false;
 BASE_FILE_LOCATION = "/actual/taxes/"
 
-try{
-  app.listen(49160);
-  console.log("Starting application");
-  console.log("Actual url:"+SERVER_URL);
-  console.log("Budget id:"+BUDGET_ID);
-}catch(e) {
-  console.log("LAST CATCH!");
+if (require.main === module) {
+  try{
+    app.listen(49160);
+    console.log("Starting application");
+    console.log("Actual url:"+SERVER_URL);
+    console.log("Budget id:"+BUDGET_ID);
+  }catch(e) {
+    console.log("LAST CATCH!");
+  }
 }
+
+module.exports = app;
