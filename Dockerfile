@@ -15,19 +15,29 @@ RUN yarn install --frozen-lockfile
 # 2. Prune devDependencies to keep only production libraries
 RUN yarn install --production --ignore-scripts --prefer-offline
 
+# 3. Create necessary directories and set permissions for Distroless 'nonroot' user (UID 65532)
+RUN mkdir -p /tmp/actual /actual/taxes && \
+    chown -R 65532:65532 /tmp/actual /actual/taxes
+
 # Stage 2: Production (Distroless)
 FROM gcr.io/distroless/nodejs22-debian12
 
 WORKDIR /usr/src/app
 
-# Copy ONLY the production node_modules
+# Copy the pre-created directories with correct ownership
+COPY --from=builder --chown=65532:65532 /tmp/actual /tmp/actual
+COPY --from=builder --chown=65532:65532 /actual/taxes /actual/taxes
+
+# Copy node_modules from builder
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY package*.json ./
+
+# Copy application source
 COPY app/ .
 
 EXPOSE 49160
 
-# Use the 'nonroot' user (UID 65532) for maximum security
+# Use the 'nonroot' user (UID 65532)
 USER 65532
 
 CMD [ "index.js" ]
