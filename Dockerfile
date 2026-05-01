@@ -1,28 +1,32 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:22-bookworm AS builder
 
 # Install build dependencies for native modules (better-sqlite3)
-RUN apk add --no-cache python3 make g++
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 COPY yarn.lock ./
 
-# Install ALL dependencies including devDependencies for native compilation
+# 1. Install all dependencies (to build native modules)
 RUN yarn install --frozen-lockfile
 
-# Stage 2: Production
-FROM node:22-alpine
+# 2. Prune devDependencies to keep only production libraries
+RUN yarn install --production --ignore-scripts --prefer-offline
 
-# Install runtime dependencies (tzdata for timezone support)
-RUN apk add --no-cache tzdata
-
-# Create necessary directories and set permissions for the non-root 'node' user
+# 3. Create necessary directories and set permissions for Distroless 'nonroot' user (UID 65532)
 RUN mkdir -p /tmp/actual /actual/taxes && \
-    chown -R node:node /tmp/actual /actual/taxes
+    chown -R 65532:65532 /tmp/actual /actual/taxes
+
+# Stage 2: Production (Distroless)
+FROM gcr.io/distroless/nodejs22-debian12
 
 WORKDIR /usr/src/app
+
+# Copy the pre-created directories with correct ownership
+COPY --from=builder --chown=65532:65532 /tmp/actual /tmp/actual
+COPY --from=builder --chown=65532:65532 /actual/taxes /actual/taxes
 
 # Copy node_modules from builder
 COPY --from=builder /usr/src/app/node_modules ./node_modules
@@ -31,9 +35,9 @@ COPY package*.json ./
 # Copy application source
 COPY app/ .
 
-# Use the non-root user provided by the alpine image
-USER node
-
 EXPOSE 49160
 
-CMD [ "node", "index.js" ]
+# Use the 'nonroot' user (UID 65532)
+USER 65532
+
+CMD [ "index.js" ]
