@@ -1,32 +1,32 @@
 name: Build and publish a Docker image to ghcr.io
 on:
   push:
+    branches: [ "main", "development" ]
+  pull_request:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: "ubuntu-24.04"
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '22'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Run unit tests
         run: npm test
 
-      # https://github.com/marketplace/actions/push-to-ghcr
-      - name: Build and publish a Docker image for ${{ github.repository }}
+      - name: Build and publish a Docker image
         uses: macbre/push-to-ghcr@master
         with:
-          image_name: ${{ github.repository }}  # it will be lowercased internally
+          image_name: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Use 'latest' for main push, head_ref for PRs, and branch name for others
+          image_tag: ${{ github.ref_name == 'main' && 'latest' || (github.event_name == 'pull_request' && github.head_ref || github.ref_name) }}

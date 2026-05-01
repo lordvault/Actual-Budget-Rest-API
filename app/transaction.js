@@ -20,28 +20,36 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     console.log("Starting process for: |"+transactionDate +"| - |"+amount+"| - |"+payee+"| - |"+notes);
 
+    // Pre-flight check
+    const isUp = await utils.isServerUp(SERVER_URL);
+    if (!isUp) {
+        throw new Error("Actual Server is unreachable at " + SERVER_URL + ". Please check your connection or server status.");
+    }
+
     console.log("Connecting to server "+SERVER_URL);
-    await api.init({
-      dataDir: '/tmp/actual',
-      serverURL: SERVER_URL,
-      password: SERVER_PASSWORD,
-    })
-    .then((response) => console.log("End initialization"))
-    .catch((reason) => {
+    try {
+      await utils.withRetry(() => api.init({
+        dataDir: '/tmp/actual',
+        serverURL: SERVER_URL,
+        password: SERVER_PASSWORD,
+      }));
+      console.log("End initialization");
+    } catch (reason) {
       console.log("1 - Error found: "+reason);
-      throw new Error("Error initializating app");
-    });
+      throw new Error("Error initializating app after multiple attempts");
+    }
 
     var current_date = utils.getCurrentDateTimeFormatted();
     notes= 'API-created '+current_date+" - "+notes;
 
     console.log("Downloading budget");
-    await api.downloadBudget(BUDGET_ID)
-    .then((response) => console.log("Budget downloaded!"))
-    .catch((reason) => {
+    try {
+      await utils.withRetry(() => api.downloadBudget(BUDGET_ID));
+      console.log("Budget downloaded!");
+    } catch (reason) {
       console.log("2 - Error found: "+reason);
-      throw new Error("Error downloading budget");
-    });
+      throw new Error("Error downloading budget after multiple attempts");
+    }
 
     let transactionList = []
     var baseTransaction = createTransaction(transactionDate, amount, payee, notes)
@@ -53,12 +61,13 @@ async function addTransaction(accountId, transactionDate, amount, payee, notes){
 
     console.log(transactionList);
     
-    await api.importTransactions(accountId, transactionList)
-    .then((response) => console.log("Transaction imported!"))
-    .catch((reason) => {
+    try {
+      await api.importTransactions(accountId, transactionList);
+      console.log("Transaction imported!");
+    } catch (reason) {
       console.log("3 - Error found: "+reason)
       throw new Error("Error importing transaction");
-    });
+    }
 
     console.log("Shutting down comunication");
     await api.shutdown();
