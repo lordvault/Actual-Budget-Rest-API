@@ -23,10 +23,23 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Determine Docker tag
+        id: tagger
+        shell: bash
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For PRs, use the feature branch name
+            echo "tag=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          else
+            # For other branches (like development), use the branch name
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and publish a Docker image
         uses: macbre/push-to-ghcr@master
         with:
           image_name: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Use 'latest' for main push, head_ref for PRs, and branch name for others
-          image_tag: ${{ github.ref_name == 'main' && 'latest' || (github.event_name == 'pull_request' && github.head_ref || github.ref_name) }}
+          image_tag: ${{ steps.tagger.outputs.tag }}
