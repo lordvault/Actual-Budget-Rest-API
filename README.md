@@ -5,7 +5,7 @@ Project API to create Transactions on 'Actual Budget'
 
 [Actual Budget link](https://actualbudget.org/)
 
-This project provides a docker image on nodejs 20, that allows consume the ['actual budget node sdk/api'](https://actualbudget.org/docs/api/) to create transactions on an account.
+This project provides a distroless docker image based on nodejs 22, that allows consume the ['actual budget node sdk/api'](https://actualbudget.org/docs/api/) to create transactions on an account.
 
 
 The account must exist on your Actual Server.
@@ -114,11 +114,12 @@ Pending Features
 - 
 [ ] Add security to rest service (App token)
 
-[ ] Support income transactions.
+[x] ~~Support income transactions.~~
 
 [x] ~~Automatic taxes. In colombia some account adds a fee over the transaction named '4x1000'. The idea its to receive a flag on the request with the account, to apply the fee on the transaction.~~
 
-[ ] Validate server comunication before create transaction
+[x] ~~Validate server comunication before create transaction~~
+
  
 [x] ~~Add functional testing ? load testing ? unit testing ?~~
 
@@ -133,10 +134,6 @@ npm test
 
 The tests use Jest and Supertest to verify the API endpoints without needing a live Actual Budget server, as the external services are mocked.
 
-Detected Issues:
-- 
-- Sometimes a PostError its generated cuz the system cant communicate with the actual server. This breaks the system and stop the container.
-
 
 Throubleshots: 
-- Time in time, actual updates the api, this takes a little of effort updating the node libraries and verifying all still working as expected.
+- Time in time, actual updates the api, this takes a little of effort updating the node libraries and verifying all still working as expected. (Trying to mitigate with dependabot)
