@@ -1,8 +1,8 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:22-bookworm AS builder
 
 # Install build dependencies for native modules (better-sqlite3)
-RUN apk add --no-cache python3 make g++
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
@@ -12,15 +12,8 @@ COPY yarn.lock ./
 # Install ALL dependencies including devDependencies for native compilation
 RUN yarn install --frozen-lockfile
 
-# Stage 2: Production
-FROM node:22-alpine
-
-# Install runtime dependencies (tzdata for timezone support)
-RUN apk add --no-cache tzdata
-
-# Create necessary directories and set permissions for the non-root 'node' user
-RUN mkdir -p /tmp/actual /actual/taxes && \
-    chown -R node:node /tmp/actual /actual/taxes
+# Stage 2: Production (Distroless)
+FROM gcr.io/distroless/nodejs22-debian12
 
 WORKDIR /usr/src/app
 
@@ -31,9 +24,14 @@ COPY package*.json ./
 # Copy application source
 COPY app/ .
 
-# Use the non-root user provided by the alpine image
-USER node
+# The Actual SDK will store data in /tmp/actual, which is writable in Distroless
+# The app handles tax file reading from its volume mount.
 
 EXPOSE 49160
 
-CMD [ "node", "index.js" ]
+# Use the 'nonroot' user (UID 65532) for maximum security
+USER 65532
+
+# In Distroless, the entrypoint is 'node' by default, 
+# so we just provide the script path.
+CMD [ "index.js" ]
