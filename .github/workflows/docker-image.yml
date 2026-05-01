@@ -31,7 +31,7 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
             # For PRs, use the feature branch name
-            echo "tag=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+            echo "tag=pr_${{ github.event.number }}" >> $GITHUB_OUTPUT
           else
             # For other branches (like development), use the branch name
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
