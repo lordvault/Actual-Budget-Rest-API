@@ -5,7 +5,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@actual-app/api": "26.5.0",
+    "@actual-app/api": "26.11.0",
     "express": "5.2.1",
     "js-yaml": "^4.1.1",
     "mathjs": "15.2.0"
