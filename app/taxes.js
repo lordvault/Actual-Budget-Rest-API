@@ -13,9 +13,15 @@ function readTaxesFile(){
 
   try {
     const fileContents = fs.readFileSync(filePath, 'utf8');
+    if (!fileContents || !fileContents.trim()) {
+      return null;
+    }
     const data = yaml.load(fileContents);
-    return data;
+    return data ?? null;
   } catch (err) {
+    if (err && err.name === 'YAMLException' && err.reason === 'expected a document, but the input is empty') {
+      return null;
+    }
     console.error('Error reading YAML file:', err.message);
     throw err;
   }
